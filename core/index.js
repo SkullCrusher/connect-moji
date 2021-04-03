@@ -7,7 +7,7 @@ module.exports = class Core {
   state = {
     url:              "ws://localhost:8080",
     client:           null,
-    encryptionKey:    "debug_encryption_key2",
+    encryptionKey:    "",
     timeoutLength:    10000,
 
     // The error that happened during the connection.
@@ -21,7 +21,11 @@ module.exports = class Core {
    * connect
    * Connect to the server.
    */
-  connect = async () => {
+  connect = async (url, encryptionKey) => {
+
+    // Set the values in place.
+    this.state.url           = url;
+    this.state.encryptionKey = encryptionKey;
 
     // Client connect the url.
     this.state.client = new WebSocket(this.state.url)
