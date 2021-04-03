@@ -33,9 +33,35 @@ module.exports = class Core {
     // Process the message.
     this.state.client.on('message', this.processMessage);
 
+    // Start up the automatic trigger cleaner.
+    setTimeout(this.cleanTriggers, 1);
+
     // Wait for the client to connect using async/await
     await new Promise(resolve => this.state.client.once('open', resolve));
   };
+  /**
+   * cleanTriggers
+   * Automatically clean the triggers (anything that is over 10x the timeout period).
+   * 
+   * @returns null;
+   */
+  cleanTriggers = () => {
+
+    let keys = Object.keys(this.state.callbackTriggers);
+
+    // Loop over the keys.
+    for(let i = 0; i < keys.length; i += 1){
+      try {
+
+        // If it's expired, remove it.
+        if(this.state.callbackTriggers[keys[i]].timestamp + (this.state.timeoutLength * 10) < Date.now()){
+          delete this.state.callbackTriggers[keys[i]];
+        }
+      }catch(e){}
+    }
+
+    setTimeout(this.cleanTriggers, 1000);
+  }
   /**
    * setEncryption
    * Set the encryption key for the messages.
@@ -211,4 +237,3 @@ module.exports = class Core {
     return await this.waitForResponse(requestId);
   };
 }
-
