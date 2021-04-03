@@ -38,6 +38,7 @@ module.exports.encryptMessage = function encryptMessage(data, encryptionKey){
  * @returns string
  */
 module.exports.decryptMessage = function decryptMessage(data, encryptionKey){
+    
     // If we don't have an encryption key, just return the value.
     if(encryptionKey === ""){
         return data;

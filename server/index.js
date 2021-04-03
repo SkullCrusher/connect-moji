@@ -11,7 +11,7 @@ module.exports = class Core {
    * host
    * Host a new server.
    */
-  host = async (encryptionKey) => {
+  host = async (handleMessage, encryptionKey) => {
 
     const context = this;
 
@@ -29,22 +29,27 @@ module.exports = class Core {
       
         // When you receive a message, send that message to every socket.
         socket.on('message', function(msg) {
+            
+            try {
+                // Decrypt the message.
+                msg = decryptMessage(msg, context.state.encryptionKey);   
 
-            // Decrypt the message.
-            msg = decryptMessage(msg, context.state.encryptionKey);            
+                // Parse the message and just send back debugging message.
+                const parsed = JSON.parse(msg);
 
-            // Parse the message and just send back debugging message.
-            const parsed = JSON.parse(msg);
+                // Process the message.
+                const processResult = handleMessage(parsed);
 
-            const debuggingResponse = {
-                "requestId": parsed.requestId,
-                "response": "debug message"
+                const response = { "requestId": parsed.requestId, "response":  processResult }
+
+                // Encrypt the data to send back.
+                let toSend = encryptMessage(JSON.stringify(response), context.state.encryptionKey);
+
+                socket.send(toSend);
+
+            }catch(e){
+                socket.send(JSON.stringify({ "error": "invalid_encryption" }));
             }
-
-            // Encrypt the data to send back.
-            let toSend = encryptMessage(JSON.stringify(debuggingResponse), context.state.encryptionKey);
-
-            sockets.forEach(s => s.send(toSend));
         });
       
         // When a socket closes, or disconnects, remove it from the array.
@@ -52,6 +57,17 @@ module.exports = class Core {
           sockets = sockets.filter(s => s !== socket);
         });
     });
+  };
+  /**
+   * setEncryptionKey
+   * Set a new encryption key.
+   * 
+   * @param {string} encryptionKey 
+   * 
+   * @returns null
+   */
+  setEncryptionKey = (encryptionKey) => {
+      this.state.encryptionKey = encryptionKey;
   };
 }
 

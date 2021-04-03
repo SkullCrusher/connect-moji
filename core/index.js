@@ -7,8 +7,12 @@ module.exports = class Core {
   state = {
     url:              "ws://localhost:8080",
     client:           null,
-    encryptionKey:    "debug_encryption_key",
+    encryptionKey:    "debug_encryption_key2",
     timeoutLength:    10000,
+
+    // The error that happened during the connection.
+    lastError:        "",
+    errorCallback:    null,
 
     // List of triggers we want to call on message result.
     callbackTriggers: {},
@@ -40,6 +44,26 @@ module.exports = class Core {
     this.state.encryptionKey = encryptionKey
   };
   /**
+   * handleError
+   * Process an error by calling the callback.
+   * 
+   * @param {string} error - The error message.
+   * 
+   * @returns null
+   */
+  handleError = (error) => {
+
+    // Save the error to our state.
+    this.state.lastError = error;
+
+    // Fire off the handler for the error if one happened.
+    if(this.state.errorCallback !== null){
+      try{
+        this.state.errorCallback(error);
+      }catch(e){}
+    }
+  };
+  /**
    * processMessage
    * Process the message recieved and put it in the callback.
    * 
@@ -48,6 +72,20 @@ module.exports = class Core {
    * @return null
    */
   processMessage = (msg) => {
+
+    // Check if we got a invalid encryption message.
+    try{
+
+      const errorTest = JSON.parse(msg);
+
+      // Send back the error.
+      if(errorTest.error !== undefined){
+        this.handleError(errorTest.error);
+        return
+      }
+    }catch(e){
+      // If it's not parsable it is not an error.
+    }
 
     // Descrypt the message.
     msg = decryptMessage(msg, this.state.encryptionKey);
@@ -167,6 +205,6 @@ module.exports = class Core {
 
     // Wait for the response.
     return await this.waitForResponse(requestId);
-  }
+  };
 }
 
