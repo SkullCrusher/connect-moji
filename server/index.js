@@ -1,21 +1,6 @@
-const WebSocket = require('ws');
-const crypto    = require("crypto");
+const WebSocket                          = require('ws');
+const { encryptMessage, decryptMessage } = require('../helpers');
 
-
-function decryptMessage(data, encryptionKey){
-
-    // If we don't have an encryption key, just return the value.
-    if(encryptionKey === ""){
-        return data;
-    }
-
-    // get password's md5 hash
-    let password_hash = crypto.createHash('md5').update(encryptionKey, 'utf-8').digest('hex').toUpperCase();
-    let iv            = new Buffer.alloc(16);
-    let decipher      = crypto.createDecipheriv('aes-256-cbc', password_hash, iv);
-
-    return decipher.update(data, 'hex', 'utf8') + decipher.final('utf8');
-}
 
 module.exports = class Core {
 
@@ -56,7 +41,10 @@ module.exports = class Core {
                 "response": "debug message"
             }
 
-            sockets.forEach(s => s.send(JSON.stringify(debuggingResponse)));
+            // Encrypt the data to send back.
+            let toSend = encryptMessage(JSON.stringify(debuggingResponse), context.state.encryptionKey);
+
+            sockets.forEach(s => s.send(toSend));
         });
       
         // When a socket closes, or disconnects, remove it from the array.

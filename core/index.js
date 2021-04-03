@@ -1,7 +1,6 @@
 
 const WebSocket  = require('ws');
-const crypto     = require('crypto');
-const { makeid } = require('../helpers');
+const { makeid, encryptMessage, decryptMessage } = require('../helpers');
 
 module.exports = class Core {
 
@@ -50,6 +49,9 @@ module.exports = class Core {
    */
   processMessage = (msg) => {
 
+    // Descrypt the message.
+    msg = decryptMessage(msg, this.state.encryptionKey);
+
     // Parse the message so we can put it in the right trigger.
     const parsed = JSON.parse(msg);
 
@@ -81,16 +83,7 @@ module.exports = class Core {
 
     // Encrypt the data if we have a key.
     if(this.state.encryptionKey !== ""){
-
-      // get password's md5 hash
-      let password_hash = crypto.createHash('md5').update(this.state.encryptionKey, 'utf-8').digest('hex').toUpperCase();
-      let iv            = new Buffer.alloc(16);
-
-      // encrypt data
-      let cipher = crypto.createCipheriv('aes-256-cbc', password_hash, iv);
-      let encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
-      
-      data = encryptedData.toUpperCase();
+      data = encryptMessage(data, this.state.encryptionKey);
     }
 
     return data;
