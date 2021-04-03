@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/SkullCrusher/connect-moji#readme",
   "dependencies": {
+    "crypto": "^1.0.1",
     "ws": "^7.4.4"
   }
 }

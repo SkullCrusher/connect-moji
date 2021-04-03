@@ -5,7 +5,9 @@ const na = new Core();
 
 
 // Connect to the server.
-na.connect().then(()=>{
-    na.send("event", { "paylozad": "example" })
+na.connect().then(async ()=>{
+    let result = await na.send("event", { "paylozad": "example" })
+
+    console.log("result", result)
 });
 

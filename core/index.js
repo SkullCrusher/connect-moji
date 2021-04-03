@@ -1,44 +1,44 @@
 
-const WebSocket = require('ws');
-
-function makeid(length) {
-  let result           = '';
-  let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-
-  for ( var i = 0; i < length; i++ ) {
-     result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-
-  return result;
-}
+const WebSocket  = require('ws');
+const crypto     = require('crypto');
+const { makeid } = require('../helpers');
 
 module.exports = class Core {
 
   state = {
-    url:              "debug url",
+    url:              "ws://localhost:8080",
     client:           null,
     encryptionKey:    "debug_encryption_key",
-    
     timeoutLength:    10000,
 
     // List of triggers we want to call on message result.
     callbackTriggers: {},
   }
-
   /**
    * connect
    * Connect to the server.
    */
   connect = async () => {
 
-    this.state.client = new WebSocket('ws://localhost:8080')
+    // Client connect the url.
+    this.state.client = new WebSocket(this.state.url)
 
-    this.state.client.on('message', this.processMessage); // msg => console.log(msg));
+    // Process the message.
+    this.state.client.on('message', this.processMessage);
 
     // Wait for the client to connect using async/await
     await new Promise(resolve => this.state.client.once('open', resolve));
-
-    console.log("connected")
+  };
+  /**
+   * setEncryption
+   * Set the encryption key for the messages.
+   * 
+   * @param {string} encryptionKey
+   * 
+   * @return null
+   */
+  setEncryption = (encryptionKey) => {
+    this.state.encryptionKey = encryptionKey
   };
   /**
    * processMessage
@@ -77,9 +77,23 @@ module.exports = class Core {
       payload
     }
 
-    // TODO encryption.
+    let data = JSON.stringify(builtPayload);
 
-    return JSON.stringify(builtPayload);
+    // Encrypt the data if we have a key.
+    if(this.state.encryptionKey !== ""){
+
+      // get password's md5 hash
+      let password_hash = crypto.createHash('md5').update(this.state.encryptionKey, 'utf-8').digest('hex').toUpperCase();
+      let iv            = new Buffer.alloc(16);
+
+      // encrypt data
+      let cipher = crypto.createCipheriv('aes-256-cbc', password_hash, iv);
+      let encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
+      
+      data = encryptedData.toUpperCase();
+    }
+
+    return data;
   };
   /**
    * waitForResponse
@@ -161,9 +175,5 @@ module.exports = class Core {
     // Wait for the response.
     return await this.waitForResponse(requestId);
   }
-
-  debug = () => {
-    console.log("debug", this.state.url, this.state.encryptionKey, makeid(32))
-  }; 
 }
 
