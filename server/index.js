@@ -2,7 +2,7 @@ const WebSocket                          = require('ws');
 const { encryptMessage, decryptMessage } = require('../helpers');
 
 
-module.exports = class Core {
+module.exports = class Server {
 
   state = {
       encryptionKey: "",

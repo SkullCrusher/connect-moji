@@ -2,7 +2,7 @@
 const WebSocket  = require('ws');
 const { makeid, encryptMessage, decryptMessage } = require('../helpers');
 
-module.exports = class Core {
+module.exports = class Client {
 
   state = {
     url:              "ws://localhost:8080",
