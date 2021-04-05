@@ -1,6 +1,6 @@
 
-const WebSocket = require('ws');
 const { makeid, encryptMessage, decryptMessage } = require('../helpers');
+// const WebSocket = require('ws');
 
 module.exports = class Client {
 
@@ -34,6 +34,8 @@ module.exports = class Client {
    */
    async connect(url, encryptionKey){
 
+    let context = this;
+
     // Set the values in place.
     this.state.url           = url;
     this.state.encryptionKey = encryptionKey;
@@ -42,13 +44,19 @@ module.exports = class Client {
     this.state.client = new WebSocket(this.state.url)
 
     // Process the message.
-    this.state.client.on('message', this.processMessage);
+    // this.state.client.on('message', this.processMessage);
+    this.state.client.onmessage = e => {
+      context.processMessage(e.data);
+    }
 
     // Start up the automatic trigger cleaner.
     setTimeout(this.cleanTriggers, 1);
 
     // Wait for the client to connect using async/await
-    await new Promise(resolve => this.state.client.once('open', resolve));
+    // await new Promise(resolve => this.state.client.once('open', resolve));
+    await new Promise(resolve => {
+      context.state.client.onopen = () => { resolve() };
+    });
   };
   /**
    * cleanTriggers

@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-crypto@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/crypto/-/crypto-1.0.1.tgz#2af1b7cad8175d24c8a1b0778255794a21803037"
-  integrity sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==
+expo-crypto@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/expo-crypto/-/expo-crypto-9.0.0.tgz#480c280e81291be8daf6cc55dd990d0dd167b351"
+  integrity sha512-BzfopeSQFIZH4sIMTbbI+p8+c80YXjTtZPmAOM8TFhRI1B1+dZpB9vrpNx4irJIl2iw4YNNK4HgzQcxWcJ/riA==
 
 ws@^7.4.4:
   version "7.4.4"
