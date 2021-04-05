@@ -4,24 +4,35 @@ const { makeid, encryptMessage, decryptMessage } = require('../helpers');
 
 module.exports = class Client {
 
-  state = {
-    url:              "ws://localhost:8080",
-    client:           null,
-    encryptionKey:    "",
-    timeoutLength:    10000,
+  constructor() {
+    this.state = {
+      url:              "ws://localhost:8080",
+      client:           null,
+      encryptionKey:    "",
+      timeoutLength:    10000,
 
-    // The error that happened during the connection.
-    lastError:        "",
-    errorCallback:    null,
+      // The error that happened during the connection.
+      lastError:        "",
+      errorCallback:    null,
 
-    // List of triggers we want to call on message result.
-    callbackTriggers: {},
+      // List of triggers we want to call on message result.
+      callbackTriggers: {},
+    }
+
+    this.connect         = this.connect.bind(this);
+    this.cleanTriggers   = this.cleanTriggers.bind(this);
+    this.setEncryption   = this.setEncryption.bind(this);
+    this.handleError     = this.handleError.bind(this);
+    this.processMessage  = this.processMessage.bind(this);
+    this._buildPayload   = this._buildPayload.bind(this);
+    this.waitForResponse = this.waitForResponse.bind(this);
+    this.send            = this.send.bind(this);
   }
   /**
    * connect
    * Connect to the server.
    */
-  connect = async (url, encryptionKey) => {
+   async connect(url, encryptionKey){
 
     // Set the values in place.
     this.state.url           = url;
@@ -45,7 +56,7 @@ module.exports = class Client {
    * 
    * @returns null;
    */
-  cleanTriggers = () => {
+  cleanTriggers(){
 
     let keys = Object.keys(this.state.callbackTriggers);
 
@@ -61,7 +72,7 @@ module.exports = class Client {
     }
 
     setTimeout(this.cleanTriggers, 1000);
-  }
+  };
   /**
    * setEncryption
    * Set the encryption key for the messages.
@@ -70,7 +81,7 @@ module.exports = class Client {
    * 
    * @return null
    */
-  setEncryption = (encryptionKey) => {
+  setEncryption(encryptionKey){
     this.state.encryptionKey = encryptionKey
   };
   /**
@@ -81,7 +92,7 @@ module.exports = class Client {
    * 
    * @returns null
    */
-  handleError = (error) => {
+  handleError(error){
 
     // Save the error to our state.
     this.state.lastError = error;
@@ -101,7 +112,7 @@ module.exports = class Client {
    * 
    * @return null
    */
-  processMessage = (msg) => {
+  processMessage(msg){
 
     // Check if we got a invalid encryption message.
     try{
@@ -140,7 +151,7 @@ module.exports = class Client {
    * @param {object} payload 
    * @returns 
    */
-  _buildPayload = (requestId, event, payload) => {
+  _buildPayload(requestId, event, payload){
     let builtPayload = {
       requestId,
       event,
@@ -164,7 +175,7 @@ module.exports = class Client {
    * 
    * @returns null 
    */
-  waitForResponse = (requestId) => {
+  waitForResponse(requestId){
     return new Promise(async (resolve, reject) => {
 
       for(;;){
@@ -215,8 +226,9 @@ module.exports = class Client {
    * @param {string} event 
    * @param {object} payload 
    * 
+   * @returns {object}
    */
-  send = async (event, payload) => {
+   async send(event, payload){
 
     // Generate a id for the request so we can process the response.
     const requestId = makeid(32);

@@ -4,14 +4,19 @@ const { encryptMessage, decryptMessage } = require('../helpers');
 
 module.exports = class Server {
 
-  state = {
-      encryptionKey: "",
-  }
-  /**
-   * host
-   * Host a new server.
-   */
-  host = async (handleMessage, encryptionKey) => {
+    constructor() {
+        this.state = {
+            encryptionKey: "",
+        }
+
+        this.host             = this.host.bind(this);
+        this.setEncryptionKey = this.setEncryptionKey.bind(this);
+    }
+   /**
+    * host
+    * Host a new server.
+    */
+   async host(handleMessage, encryptionKey){
 
     const context = this;
 
@@ -66,7 +71,7 @@ module.exports = class Server {
    * 
    * @returns null
    */
-  setEncryptionKey = (encryptionKey) => {
+  setEncryptionKey(encryptionKey){
       this.state.encryptionKey = encryptionKey;
   };
 }
