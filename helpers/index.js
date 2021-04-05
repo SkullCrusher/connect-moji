@@ -1,6 +1,7 @@
 
 // https://docs.expo.io/versions/latest/sdk/crypto/
-const crypto = require('expo-crypto');
+// const crypto = require('expo-crypto');
+const CryptoJS = require("crypto-js");
 
 /**
  * encryptMessage
@@ -17,6 +18,7 @@ module.exports.encryptMessage = function encryptMessage(data, encryptionKey){
     if(encryptionKey === ""){
         return data;
     }
+    /*
 
     // get password's md5 hash
     let password_hash = crypto.createHash('md5').update(encryptionKey, 'utf-8').digest('hex').toUpperCase();
@@ -27,6 +29,9 @@ module.exports.encryptMessage = function encryptMessage(data, encryptionKey){
     let encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
       
     return encryptedData.toUpperCase();
+    */
+
+    return CryptoJS.AES.encrypt(data, encryptionKey).toString();
 };
 
 /**
@@ -45,12 +50,18 @@ module.exports.decryptMessage = function decryptMessage(data, encryptionKey){
         return data;
     }
 
+    /*
     // get password's md5 hash
+    
     let password_hash = crypto.createHash('md5').update(encryptionKey, 'utf-8').digest('hex').toUpperCase();
     let iv            = new Buffer.alloc(16);
     let decipher      = crypto.createDecipheriv('aes-256-cbc', password_hash, iv);
 
     return decipher.update(data, 'hex', 'utf8') + decipher.final('utf8');
+    */
+
+    var bytes  = CryptoJS.AES.decrypt(data, encryptionKey);
+    return bytes.toString(CryptoJS.enc.Utf8);
 };
 
 /**
