@@ -93,6 +93,17 @@ module.exports = class Client {
     this.state.encryptionKey = encryptionKey
   };
   /**
+   * setEncryption
+   * Set the error handler for messages.
+   * 
+   * @param {func} callback
+   * 
+   * @return null
+   */
+  setEncryption(callback){
+      this.state.errorCallback = callback
+  };
+  /**
    * handleError
    * Process an error by calling the callback.
    * 
