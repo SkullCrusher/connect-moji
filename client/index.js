@@ -1,5 +1,5 @@
 
-const WebSocket  = require('ws');
+const WebSocket = require('ws');
 const { makeid, encryptMessage, decryptMessage } = require('../helpers');
 
 module.exports = class Client {
