@@ -100,7 +100,7 @@ module.exports = class Client {
    * 
    * @return null
    */
-  setEncryption(callback){
+  setErrorHandler(callback){
       this.state.errorCallback = callback
   };
   /**
