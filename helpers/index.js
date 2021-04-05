@@ -1,5 +1,6 @@
 
-const crypto = require('crypto');
+// https://docs.expo.io/versions/latest/sdk/crypto/
+const crypto = require('expo-crypto');
 
 /**
  * encryptMessage
