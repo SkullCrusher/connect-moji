@@ -1,5 +1,5 @@
 # connect-moji
  
-![logo](awesome-compose.jpg)
+![logo](connect-moji.png)
 
 > Event driven mobile control framework
