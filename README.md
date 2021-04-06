@@ -37,7 +37,18 @@ na.connect("ws://localhost:8080", "debug_encryption_key").then(async ()=>{
 
 Server
 ```javascript
-console.log("a");
+const Server = require('connect-moji');
+
+// Create a new server.
+const na     = new Server();
+
+// Handles determing how to process events.
+function handleMessage(payload){
+    return "result example"
+}
+
+// Host a listener.
+na.host(handleMessage, "debug_encryption_key")
 ```
 
 Runnable examples:
