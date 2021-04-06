@@ -10,14 +10,43 @@ Connect-moji is a simple framework designed to supply information to any number 
 ## Getting started
 WIP
 
+## Installing
+```console
+npm i https://github.com/SkullCrusher/connect-moji
+```
+
 ## Examples
-WIP
+
+Client
+```javascript
+const { Client } = require('connect-moji');
+
+// Create a new client.
+const na = new Client();
+
+// Connect to the server.
+na.connect("ws://localhost:8080", "debug_encryption_key").then(async ()=>{
+
+    // Trigger a event and wait for the response.
+    let result = await na.send("example-event", { "key": "example" })
+
+    console.log("result", result)
+});
+
+```
+
+Server
+```javascript
+console.log("a");
+```
+
+Runnable examples:
 - [`Server Example`](https://github.com/SkullCrusher/connect-moji/blob/main/example-server.js) - Sample server
 - [`Client Example`](https://github.com/SkullCrusher/connect-moji/blob/main/example-client.js) - Sample client
 
 
 ## Secruity
-WIP
+If a encryption key is provided all traffic is encrypted using AES. Public private keys are not used to prevent
 
 
 ## Contribute
