@@ -18,3 +18,5 @@ WIP
 WIP
 
 
+# Contribute
+We welcome people to help us improve the framework or request features. Please create a issue for bugs and email us at hi@kickmoji.io for a feature request to talk to us directly.
