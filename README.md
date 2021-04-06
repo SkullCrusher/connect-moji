@@ -1,3 +1,5 @@
 # connect-moji
  
-WIP
+![logo](connect-moji.png)
+
+> Event driven mobile control framework
