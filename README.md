@@ -10,10 +10,13 @@ Connect-moji is a simple framework designed to supply information to any number 
 ## Getting started
 WIP
 
-## Installing
+Installing
 ```console
 npm i https://github.com/SkullCrusher/connect-moji
 ```
+
+## Understanding how it works
+WIP
 
 ## Examples
 
