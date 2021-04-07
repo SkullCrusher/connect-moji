@@ -54,8 +54,15 @@ module.exports = class Client {
 
     // Wait for the client to connect using async/await
     // await new Promise(resolve => this.state.client.once('open', resolve));
-    await new Promise(resolve => {
+    await new Promise((resolve, reject) => {
+
+      // If we were able to open the connection.
       context.state.client.onopen = () => { resolve() };
+
+      // If there was an error connecting.
+      context.state.client.onerror = e => {
+        reject(e)
+      };
     });
   };
   /**
