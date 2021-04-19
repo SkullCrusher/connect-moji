@@ -4,11 +4,10 @@
 
 > Event driven mobile control framework.
 
-Connect-moji is a simple framework designed to supply information to any number of clients the same data based on event requests only. The design is to allow any number of clients to control the same device without conflict.
+Connect-moji is a simple framework designed to supply information and control from one device to many clients at the same time without conflict. Data is provided on client requests only and without required constant connection to improve mobile preformance.  
 
 
 ## Getting started
-WIP
 
 Installing
 ```console
@@ -16,7 +15,9 @@ npm i https://github.com/SkullCrusher/connect-moji
 ```
 
 ## Understanding how it works
-WIP
+
+
+
 
 ## Examples
 
