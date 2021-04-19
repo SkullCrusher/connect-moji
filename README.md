@@ -15,7 +15,7 @@ npm i https://github.com/SkullCrusher/connect-moji
 ```
 
 ## Understanding our use case
-Historically our software was only a desktop application which means the user has to physcially be at the machine or use some form of remote desktop software to manage it. Connect moji 
+Historically our software was only a desktop application which means the user has to physcially be at the machine or use some form of remote desktop software to manage it. So I built connect moji as a simple framework to handle sending data to and from clients. Being simple and extremely flexible was a big goal because it has to work on electron, react, and react native.
 
 ## How it works
 
