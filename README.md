@@ -4,7 +4,7 @@
 
 > Event driven mobile control framework.
 
-Connect-moji is a simple framework designed to supply information and control from one device to many clients at the same time without conflict. Data is provided on client requests only and without required constant connection to improve mobile preformance.  
+Connect-moji is a simple framework designed to supply information and control from one device to many clients at the same time without conflict. Data is provided on client requests only and without required constant connection to improve mobile preformance. 
 
 
 ## Getting started
@@ -14,9 +14,25 @@ Installing
 npm i https://github.com/SkullCrusher/connect-moji
 ```
 
-## Understanding how it works
+## Understanding our use case
+Historically our software was only a desktop application which means the user has to physcially be at the machine or use some form of remote desktop software to manage it. Connect moji 
 
+## How it works
 
+General points
+- Flow of a request
+  - The client asks connect moji to send a event and payload to the device and waits for a response.
+  - Connect moji encrypts the event and payload and attempts to send the message to the server.
+  - If there is a connection issue or no response is provided in a reasonable time a error is thrown.
+  - If the server provides a response it is decrypted and client gets the response payload.
+- Server
+  - Requests that can't be decrypted are automatically rejected with a response.
+  - Every event is handled through one function instead of independently binding a function for each event.
+- Client
+  - If an encryption key is bad the event handler for bad encryption is fired and the request times out. The server can't decrypt the message to determine the event id so it just gives back an generic message.
+  - The encryption key can be swapped out without reconnecting to the server.
+
+For our production environment we use connect-moji-middleware which manages message replication, authentication, and client management. We use the remote server connection option which has the server connect to the remote middleware. 
 
 
 ## Examples
