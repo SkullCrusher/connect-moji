@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+crypto-js@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.0.0.tgz#2904ab2677a9d042856a2ea2ef80de92e4a36dcc"
+  integrity sha512-bzHZN8Pn+gS7DQA6n+iUmBfl0hO5DJq++QP3U6uTucDtk/0iGpXd/Gg7CGR0p8tJhofJyaKoWBuJI4eAO00BBg==
+
 expo-crypto@^9.0.0:
   version "9.0.0"
   resolved "https://registry.yarnpkg.com/expo-crypto/-/expo-crypto-9.0.0.tgz#480c280e81291be8daf6cc55dd990d0dd167b351"
