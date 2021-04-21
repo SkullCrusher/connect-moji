@@ -61,7 +61,7 @@ module.exports = class Server {
         await new Promise((resolve, reject) => {
 
             // If we were able to open the connection.
-            context.state.client.onopen = () => { };
+            context.state.client.onopen = () => { resolve() };
 
             // If there was an error connecting.
             context.state.client.onerror = e => {
