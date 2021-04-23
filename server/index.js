@@ -31,7 +31,7 @@ module.exports = class Server {
         this.state.client = new WebSocket(this.state.url)
 
         // Process the message.
-        this.state.client.onmessage = e => {
+        this.state.client.onmessage = async e => {
 
             try {
                 // Decrypt the message.
@@ -41,7 +41,7 @@ module.exports = class Server {
                 const parsed = JSON.parse(msg);
 
                 // Process the message.
-                const processResult = handleMessage(parsed);
+                const processResult = await handleMessage(parsed);
 
                 const response = { "requestId": parsed.requestId, "response":  processResult }
 
