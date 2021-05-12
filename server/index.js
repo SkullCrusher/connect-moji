@@ -30,6 +30,8 @@ module.exports = class Server {
         // Client connect the url.
         this.state.client = new WebSocket(this.state.url)
 
+        this.state.connected = false;
+
         // Process the message.
         this.state.client.onmessage = async e => {
 
@@ -61,10 +63,21 @@ module.exports = class Server {
         await new Promise((resolve, reject) => {
 
             // If we were able to open the connection.
-            context.state.client.onopen = () => { resolve() };
+            context.state.client.onopen = () => {
+                context.state.connected = true;
+                resolve()
+            };
 
             // If there was an error connecting.
             context.state.client.onerror = e => {
+
+                // Automatically attempt to reconnect if it's down.
+                if(context.state.connected){
+                    context.hostMiddleware(url, handleMessage, encryptionKey)
+                    return;
+                }
+
+                // We weren't connected so don't do anything.
                 reject(e)
             };
         });
