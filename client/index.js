@@ -1,6 +1,9 @@
 
 const { makeid, encryptMessage, decryptMessage } = require('../helpers');
-// const WebSocket = require('ws');
+
+const WebSocket = require("isomorphic-ws");
+const debugging = false;
+
 
 module.exports = class Client {
 
@@ -10,6 +13,9 @@ module.exports = class Client {
       client:           null,
       encryptionKey:    "",
       timeoutLength:    10000,
+      reconnectDelay:   2500,
+
+      websocketStatus:  "disconnected",
 
       // The error that happened during the connection.
       lastError:        "",
@@ -19,20 +25,41 @@ module.exports = class Client {
       callbackTriggers: {},
     }
 
-    this.connect         = this.connect.bind(this);
-    this.cleanTriggers   = this.cleanTriggers.bind(this);
-    this.setEncryption   = this.setEncryption.bind(this);
-    this.handleError     = this.handleError.bind(this);
-    this.processMessage  = this.processMessage.bind(this);
-    this._buildPayload   = this._buildPayload.bind(this);
-    this.waitForResponse = this.waitForResponse.bind(this);
-    this.send            = this.send.bind(this);
+    this.connect          = this.connect.bind(this);
+    this.cleanTriggers    = this.cleanTriggers.bind(this);
+    this.setEncryption    = this.setEncryption.bind(this);
+    this.handleError      = this.handleError.bind(this);
+    this.processMessage   = this.processMessage.bind(this);
+    this._buildPayload    = this._buildPayload.bind(this);
+    this.waitForResponse  = this.waitForResponse.bind(this);
+    this.send             = this.send.bind(this);
+    this.attemptReconnect = this.attemptReconnect.bind(this);
+    this.setStatus        = this.setStatus.bind(this);
+    this.logging          = this.logging.bind(this);
   }
+  /**
+   * setStatus
+   * Set the current state (in the future will trigger callback).
+   */
+  setStatus(arg){
+    this.websocketStatus = arg;
+  };
+  /**
+   * logging
+   * Only console log if we are in debug mode.
+   */
+  logging(arg){
+    if(debugging){
+      console.log(arg);
+    }
+  };
   /**
    * connect
    * Connect to the server.
    */
-   async connect(url, encryptionKey){
+   async connect(url, encryptionKey, retry){
+
+    this.logging("(connect-moji): connecting.");
 
     let context = this;
 
@@ -44,26 +71,67 @@ module.exports = class Client {
     this.state.client = new WebSocket(this.state.url)
 
     // Process the message.
-    // this.state.client.on('message', this.processMessage);
     this.state.client.onmessage = e => {
       context.processMessage(e.data);
     }
 
-    // Start up the automatic trigger cleaner.
-    setTimeout(this.cleanTriggers, 1);
+    // To prevent duplicates, block if it's reconnect.
+    if(retry !== true){
+
+      // Automatically reconnect.
+      this.state.client.onclose = () => {
+          this.logging("(connect-moji): Reconnecting")
+          this.setStatus("reconnecting")
+          this.state.client.close()
+          this.attemptReconnect(url, encryptionKey, true)
+      };
+
+      // Start up the automatic trigger cleaner.
+      setTimeout(this.cleanTriggers, 1);
+    }
 
     // Wait for the client to connect using async/await
     // await new Promise(resolve => this.state.client.once('open', resolve));
     await new Promise((resolve, reject) => {
 
       // If we were able to open the connection.
-      context.state.client.onopen = () => { resolve() };
+      context.state.client.onopen = () => {
+        this.logging("(connect-moji): connected")
+        context.setStatus("connected")
+        resolve()
+      };
 
       // If there was an error connecting.
       context.state.client.onerror = e => {
-        reject(e)
+        context.logging("(connect-moji): error connecting")
+
+        // If we are retrying, don't throw an error.
+        if(retry === true){
+          context.setStatus("reconnecting")
+          context.attemptReconnect(url, encryptionKey, true)
+          resolve()
+        }else{
+          context.setStatus("error")
+          reject(e)
+        }
       };
     });
+  };
+  /**
+   * attemptReconnect
+   * Handle reconnecting to the server.
+   **/
+  attemptReconnect(url, encryptionKey){
+
+    let context = this;
+
+    setTimeout(() => {
+      try{
+        context.connect(url, encryptionKey, true)
+      }catch(e){
+        // Do nothing.
+      }
+    }, this.state.reconnectDelay);
   };
   /**
    * cleanTriggers
