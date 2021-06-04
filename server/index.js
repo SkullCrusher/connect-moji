@@ -115,15 +115,22 @@ module.exports = class Server {
                     // Parse the message and just send back debugging message.
                     const parsed = JSON.parse(msg);
 
+                    let originalLength = parsed.payload.length;
+
                     // Decrypt the message.
                     parsed["payload"] = decryptMessage(parsed.payload, context.state.encryptionKey);
+
+                    if(originalLength > 0 && parsed.payload.length === 0){
+                        socket.send(JSON.stringify({ "requestId": parsed.requestId, "error": "invalid_encryption" }));
+                        return
+                    }
 
                     // Process the message.
                     const processResult = handleMessage(parsed);
 
                     const response = {
                         "requestId": parsed.requestId,
-                        "response":  encryptMessage(JSON.stringify(processResult), context.state.encryptionKey);
+                        "response":  encryptMessage(JSON.stringify(processResult), context.state.encryptionKey)
                     }
 
                     // Encrypt the data to send back.
@@ -132,13 +139,14 @@ module.exports = class Server {
                     socket.send(toSend);
 
                 }catch(e){
+                    console.log("e", e)
                     socket.send(JSON.stringify({ "error": "invalid_encryption" }));
                 }
             });
 
             // When a socket closes, or disconnects, remove it from the array.
             socket.on('close', function() {
-            sockets = sockets.filter(s => s !== socket);
+                sockets = sockets.filter(s => s !== socket);
             });
         });
     };

@@ -246,15 +246,10 @@ module.exports = class Client {
    * @returns 
    */
   _buildPayload(requestId, event, payload){
-    let builtPayload = {
+    const builtPayload = {
       requestId,
       event,
-      payload
-    }
-
-    // Encrypt the data if we have a key.
-    if(this.state.encryptionKey !== ""){
-      builtPayload["payload"] = encryptMessage(builtPayload["payload"], this.state.encryptionKey);
+      payload: encryptMessage(JSON.stringify(payload), this.state.encryptionKey)
     }
 
     return JSON.stringify(builtPayload);

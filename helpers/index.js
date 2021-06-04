@@ -75,11 +75,10 @@ module.exports.decryptMessage = function decryptMessage(data, encryptionKey){
 module.exports.makeid = function (length){
     let result           = '';
     let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  
+
     for ( var i = 0; i < length; i++ ) {
        result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
-  
+
     return result;
 };
-  
