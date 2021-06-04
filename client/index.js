@@ -217,7 +217,8 @@ module.exports = class Client {
       if(errorTest.error !== undefined){
 
         // If it has a requestId in it, ONLY process the message if we have that in our list (so we don't process others errors).
-        if(errorTest.requestId !== undefined && this.state.callbackTriggers[errorTest.requestId] === undefined){
+        if(errorTest.requestId === undefined || this.state.callbackTriggers[errorTest.requestId] === undefined){
+          console.log("Dropped error because no trigger", errorTest)
           return
         }
 
@@ -227,6 +228,7 @@ module.exports = class Client {
         return
       }
     }catch(e){
+      //console.log("e", e, this.state)
       // If it's not parsable it is not an error.
     }
 
