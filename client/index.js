@@ -228,7 +228,7 @@ module.exports = class Client {
         return
       }
     }catch(e){
-      //console.log("e", e, this.state)
+      // console.log("e", e, this.state)
       // If it's not parsable it is not an error.
     }
 
@@ -244,7 +244,11 @@ module.exports = class Client {
     }
 
     // Inject the result.
-    this.state.callbackTriggers[parsed.requestId].result = parsed.response;
+    try {
+      this.state.callbackTriggers[parsed.requestId].result = JSON.parse(parsed.response);
+    }catch(e){
+      this.state.callbackTriggers[parsed.requestId].result = parsed.response;
+    }
   };
   /**
    * _buildPayload
