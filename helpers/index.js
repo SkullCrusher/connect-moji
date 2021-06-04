@@ -27,7 +27,7 @@ module.exports.encryptMessage = function encryptMessage(data, encryptionKey){
     // encrypt data
     let cipher = crypto.createCipheriv('aes-256-cbc', password_hash, iv);
     let encryptedData = cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
-      
+
     return encryptedData.toUpperCase();
     */
 
@@ -44,7 +44,7 @@ module.exports.encryptMessage = function encryptMessage(data, encryptionKey){
  * @returns string
  */
 module.exports.decryptMessage = function decryptMessage(data, encryptionKey){
-    
+
     // If we don't have an encryption key, just return the value.
     if(encryptionKey === ""){
         return data;
@@ -52,7 +52,7 @@ module.exports.decryptMessage = function decryptMessage(data, encryptionKey){
 
     /*
     // get password's md5 hash
-    
+
     let password_hash = crypto.createHash('md5').update(encryptionKey, 'utf-8').digest('hex').toUpperCase();
     let iv            = new Buffer.alloc(16);
     let decipher      = crypto.createDecipheriv('aes-256-cbc', password_hash, iv);

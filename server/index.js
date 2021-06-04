@@ -36,19 +36,22 @@ module.exports = class Server {
         this.state.client.onmessage = async e => {
 
             try {
-                // Decrypt the message.
-                let msg = decryptMessage(e.data, context.state.encryptionKey);
 
                 // Parse the message and just send back debugging message.
-                const parsed = JSON.parse(msg);
+                const msg = JSON.parse(e.data);
+
+                // Decrypt the message.
+                msg["payload"] = decryptMessage(msg.payload, context.state.encryptionKey);
 
                 // Process the message.
                 const processResult = await handleMessage(parsed);
 
-                const response = { "requestId": parsed.requestId, "response":  processResult }
+                let toSend = {
+                    "requestId": parsed.requestId,
+                    "response": encryptMessage(JSON.stringify(processResult), context.state.encryptionKey)
+                }
 
-                // Encrypt the data to send back.
-                let toSend = encryptMessage(JSON.stringify(response), context.state.encryptionKey);
+                toSend = JSON.stringify(toSend);
 
                 // Send the payload to the server.
                 context.state.client.send(toSend);
@@ -98,29 +101,33 @@ module.exports = class Server {
         }
 
         const server = new WebSocket.Server({ port: 8080 });
-        
+
         let sockets = [];
 
         server.on('connection', function(socket) {
             sockets.push(socket);
-        
+
             // When you receive a message, send that message to every socket.
             socket.on('message', function(msg) {
-                
+
                 try {
-                    // Decrypt the message.
-                    msg = decryptMessage(msg, context.state.encryptionKey);   
 
                     // Parse the message and just send back debugging message.
                     const parsed = JSON.parse(msg);
 
+                    // Decrypt the message.
+                    parsed["payload"] = decryptMessage(parsed.payload, context.state.encryptionKey);
+
                     // Process the message.
                     const processResult = handleMessage(parsed);
 
-                    const response = { "requestId": parsed.requestId, "response":  processResult }
+                    const response = {
+                        "requestId": parsed.requestId,
+                        "response":  encryptMessage(JSON.stringify(processResult), context.state.encryptionKey);
+                    }
 
                     // Encrypt the data to send back.
-                    let toSend = encryptMessage(JSON.stringify(response), context.state.encryptionKey);
+                    let toSend = JSON.stringify(response);
 
                     socket.send(toSend);
 
@@ -128,7 +135,7 @@ module.exports = class Server {
                     socket.send(JSON.stringify({ "error": "invalid_encryption" }));
                 }
             });
-        
+
             // When a socket closes, or disconnects, remove it from the array.
             socket.on('close', function() {
             sockets = sockets.filter(s => s !== socket);

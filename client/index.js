@@ -57,7 +57,7 @@ module.exports = class Client {
    * connect
    * Connect to the server.
    */
-   async connect(url, encryptionKey, retry){
+  async connect(url, encryptionKey, retry){
 
     this.logging("(connect-moji): connecting.");
 
@@ -159,9 +159,9 @@ module.exports = class Client {
   /**
    * setEncryption
    * Set the encryption key for the messages.
-   * 
+   *
    * @param {string} encryptionKey
-   * 
+   *
    * @return null
    */
   setEncryption(encryptionKey){
@@ -170,9 +170,9 @@ module.exports = class Client {
   /**
    * setEncryption
    * Set the error handler for messages.
-   * 
+   *
    * @param {func} callback
-   * 
+   *
    * @return null
    */
   setErrorHandler(callback){
@@ -201,9 +201,9 @@ module.exports = class Client {
   /**
    * processMessage
    * Process the message recieved and put it in the callback.
-   * 
-   * @param {string} msg 
-   * 
+   *
+   * @param {string} msg
+   *
    * @return null
    */
   processMessage(msg){
@@ -222,11 +222,11 @@ module.exports = class Client {
       // If it's not parsable it is not an error.
     }
 
-    // Descrypt the message.
-    msg = decryptMessage(msg, this.state.encryptionKey);
-
     // Parse the message so we can put it in the right trigger.
     const parsed = JSON.parse(msg);
+
+    // Descrypt the message.
+    parsed.response = decryptMessage(parsed.response, this.state.encryptionKey);
 
     // If the record doesn't exist, just ignore the message.
     if(this.state.callbackTriggers[parsed.requestId] === undefined){
@@ -252,14 +252,12 @@ module.exports = class Client {
       payload
     }
 
-    let data = JSON.stringify(builtPayload);
-
     // Encrypt the data if we have a key.
     if(this.state.encryptionKey !== ""){
-      data = encryptMessage(data, this.state.encryptionKey);
+      builtPayload["payload"] = encryptMessage(builtPayload["payload"], this.state.encryptionKey);
     }
 
-    return data;
+    return JSON.stringify(builtPayload);
   };
   /**
    * waitForResponse
@@ -283,7 +281,7 @@ module.exports = class Client {
 
         // Check to see if the record.
         if(this.state.callbackTriggers[requestId].result !== ""){
-        
+
           // make a local copy of the result.
           const result = this.state.callbackTriggers[requestId].result;
 
@@ -309,7 +307,7 @@ module.exports = class Client {
         }
 
         // Delay the loop to prevent spam.
-        await new Promise((resolve, reject )=>{ setTimeout(resolve, 10) })
+        await new Promise((resolve, reject)=>{ setTimeout(resolve, 10) })
       }
     })
   };
