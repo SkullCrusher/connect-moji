@@ -215,6 +215,14 @@ module.exports = class Client {
 
       // Send back the error.
       if(errorTest.error !== undefined){
+
+        // If it has a requestId in it, ONLY process the message if we have that in our list (so we don't process others errors).
+        if(errorTest.requestId !== undefined && this.state.callbackTriggers[errorTest.requestId] === undefined){
+          return
+        }
+
+        this.state.callbackTriggers[errorTest.requestId].result = errorTest.error;
+
         this.handleError(errorTest.error);
         return
       }

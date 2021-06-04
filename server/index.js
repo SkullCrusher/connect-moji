@@ -40,8 +40,15 @@ module.exports = class Server {
                 // Parse the message and just send back debugging message.
                 const msg = JSON.parse(e.data);
 
+                const originalLength = msg["payload"].length;
+
                 // Decrypt the message.
                 msg["payload"] = decryptMessage(msg.payload, context.state.encryptionKey);
+
+                if(originalLength > 0 && msg["payload"].length === 0){
+                    context.state.client.send(JSON.stringify({ "requestId": msg.requestId, "error": "invalid_encryption" }));
+                    return
+                }
 
                 // Process the message.
                 const processResult = await handleMessage(parsed);
