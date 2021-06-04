@@ -51,10 +51,10 @@ module.exports = class Server {
                 }
 
                 // Process the message.
-                const processResult = await handleMessage(parsed);
+                const processResult = await handleMessage(msg);
 
                 let toSend = {
-                    "requestId": parsed.requestId,
+                    "requestId": msg.requestId,
                     "response": encryptMessage(JSON.stringify(processResult), context.state.encryptionKey)
                 }
 
@@ -63,6 +63,7 @@ module.exports = class Server {
                 // Send the payload to the server.
                 context.state.client.send(toSend);
             }catch(e){
+                // console.log("e", e)
                 context.state.client.send(JSON.stringify({ "error": "invalid_encryption" }));
             }
 
@@ -146,7 +147,7 @@ module.exports = class Server {
                     socket.send(toSend);
 
                 }catch(e){
-                    console.log("e", e)
+                    // console.log("e", e)
                     socket.send(JSON.stringify({ "error": "invalid_encryption" }));
                 }
             });
