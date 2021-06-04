@@ -50,6 +50,8 @@ module.exports = class Server {
                     return
                 }
 
+                msg["payload"] = JSON.parse(msg["payload"]);
+
                 // Process the message.
                 const processResult = await handleMessage(msg);
 
@@ -132,6 +134,8 @@ module.exports = class Server {
                         socket.send(JSON.stringify({ "requestId": parsed.requestId, "error": "invalid_encryption" }));
                         return
                     }
+
+                    parsed["payload"] = JSON.parse(parsed["payload"]);
 
                     // Process the message.
                     const processResult = handleMessage(parsed);
